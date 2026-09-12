@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8">
+<title>Georgian Bakery</title>
+
+<!-- ========== შრიფტები (Google Fonts) ========== -->
+<!-- Bebas Neue = ფასების შრიფტი, Noto Sans Georgian = ქართული ტექსტი -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Georgian:wght@300;400;500;600;700;800;900&display=swap">
+
+<style>
+
+  /* ========== ფერები ==========
+     აქ იცვლება მთელი გვერდის ფერები.
+     შეცვალე hex კოდი (#...) რომ ფერი შეიცვალოს.
+  */
+  :root {
+    --bg: #1A1A1A;           /* მთავარი ფონის ფერი (მუქი ნაცრისფერი) */
+    --bg-card: #242424;      /* ბარათების/თამბნეილების ფონი */
+    --bg-hero: #111111;      /* ჰერო ბარის ფონი (ზედა ნაწილი) */
+    --amber: #E8A020;        /* ოქროსფერი — ფასები, კატეგორიის სათაურები */
+    --red: #D4442A;          /* წითელი — "კიჩილი" სახელი, ბეჯები */
+    --white: #F5F0E8;        /* თეთრი — ძირითადი ტექსტი */
+    --grey: #999;            /* ნაცრისფერი — აღწერა, ქვესათაური */
+    --grey-dim: #555;        /* მუქი ნაცრისფერი — არააქტიური წერტილები */
+    --text: #F5F0E8;         /* ტექსტის ფერი */
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /* ========== მთავარი კონტეინერი ==========
+     ვერტიკალური ეკრანზეა გათვლილი (9:16)
+  */
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans Georgian', 'Inter', sans-serif;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;           /* სქროლი გამორთულია */
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 9 / 16;      /* ვერტიკალური TV პროპორცია */
+    max-width: 100vw;
+  }
+
+  /* ========== ჰერო ბარი (ზედა ნაწილი — სახელი + კარუსელი) ========== */
+  .hero {
+    background: var(--bg-hero);
+    padding: 3vh 5vw 2vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .hero-headline {
+    text-align: center;
+    margin-bottom: 2.5vh;
+  }
+
+  /* საცხობის სახელი "კიჩილი" */
+  .hero-headline .geo-title {
+    font-family: 'Noto Sans Georgian', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 6vw, 4rem);   /* ზომა — შეცვალე 6vw უფრო დიდი/პატარა */
+    color: var(--white);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .hero-headline .geo-title span { color: var(--red); }  /* "კიჩილი" წითლად */
+
+  /* ქვესათაური "თქვენი საყვარელი სამზარეულოთი" */
+  .hero-headline .sub {
+    font-size: clamp(0.8rem, 2.2vw, 1.4rem);
+    color: var(--grey);
+    letter-spacing: 0.1em;
+    margin-top: 0.8vh;
+    font-weight: 400;
+  }
+
+  /* ========== კარუსელი (სლაიდშოუ) ========== */
+  .carousel {
+    position: relative;
+    width: 100%;
+    max-width: 70vw;           /* კარუსელის სიგანე */
+    overflow: hidden;
+  }
+
+  .carousel-track {
+    display: flex;
+    width: 100%;
+    position: relative;
+    min-height: 30vh;           /* კარუსელის სიმაღლე */
+  }
+
+  /* თითოეული სლაიდი — ჩვეულებრივ უჩინარია */
+  .carousel-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.8s ease;   /* fade ანიმაციის სიჩქარე */
+    pointer-events: none;
+  }
+
+  /* აქტიური სლაიდი — ჩანს */
+  .carousel-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* კერძის ბარათი კარუსელში */
+  .hero-card {
+    text-align: center;
+    position: relative;
+    width: 60vw;                /* ბარათის სიგანე */
+  }
+
+  /* კერძის სურათის ადგილი */
+  .hero-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;        /* სურათის პროპორცია */
+    border-radius: 16px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(4rem, 12vw, 8rem);   /* emoji ზომა (ფოტოთი ჩანაცვლდება) */
+    margin-bottom: 1.5vh;
+    position: relative;
+    overflow: hidden;
+    border: 2px solid #333;
+  }
+
+  /* სურათზე მუქი გრადიენტი ქვემოდან */
+  .hero-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+  }
+
+  /* კერძის სახელი კარუსელში */
+  .hero-card-name {
+    font-weight: 800;
+    font-size: clamp(1.2rem, 3.5vw, 2.2rem);
+    color: var(--white);
+    line-height: 1.2;
+  }
+
+  /* კერძის აღწერა კარუსელში */
+  .hero-card-desc {
+    font-size: clamp(0.7rem, 1.8vw, 1.1rem);
+    color: var(--grey);
+    margin-top: 0.3vh;
+    font-weight: 300;
+  }
+
+  /* კერძის ფასი კარუსელში */
+  .hero-card-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 5vw, 3.5rem);   /* ფასის ზომა */
+    color: var(--amber);
+    margin-top: 0.5vh;
+  }
+
+  /* ბეჯი ("ჰიტი", "ახალი") — სურათის ზედა მარჯვენა კუთხეში */
+  .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--red);
+    color: var(--white);
+    font-size: clamp(0.6rem, 1.5vw, 1rem);
+    font-weight: 700;
+    padding: 0.3em 0.8em;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    z-index: 2;
+  }
+
+  /* "თქვენი ფოტო" ტექსტი სურათის ქვემოთ */
+  .photo-note {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(0.5rem, 1.2vw, 0.8rem);
+    color: #888;
+    background: rgba(0,0,0,0.6);
+    padding: 0.2em 0.8em;
+    border-radius: 4px;
+    z-index: 3;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* კარუსელის წერტილები (ინდიკატორი რომელი სლაიდია) */
+  .carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 1.5vw;
+    margin-top: 1.5vh;
+  }
+
+  .carousel-dot {
+    width: clamp(8px, 1.5vw, 14px);
+    height: clamp(8px, 1.5vw, 14px);
+    border-radius: 50%;
+    background: var(--grey-dim);
+    transition: background 0.4s ease, transform 0.3s ease;
+  }
+
+  .carousel-dot.active {
+    background: var(--amber);
+    transform: scale(1.3);
+  }
+
+  /* ========== მენიუს ნაწილი (3 სვეტი) ========== */
+  .menu-body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);  /* 3 სვეტი — შეცვალე 2 თუ 2 სვეტი გინდა */
+    gap: 0;
+    padding: 1.5vh 0 0;
+    overflow: hidden;
+  }
+
+  /* თითოეული სვეტი */
+  .menu-col {
+    padding: 0 3vw;
+    border-right: 1px solid #2A2A2A;    /* სვეტებს შორის ხაზი */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .menu-col:last-child { border-right: none; }
+
+  /* კატეგორიის სათაური (მაგ. "პურები") */
+  .col-title {
+    font-weight: 900;
+    font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+    color: var(--amber);
+    letter-spacing: 0.03em;
+    padding-bottom: 0.8vh;
+    margin-bottom: 0.6vh;
+    border-bottom: 2px solid var(--amber);   /* ოქროსფერი ხაზი ქვემოთ */
+    display: flex;
+    align-items: center;
+    gap: 1vw;
+  }
+
+  .col-title .ico { font-size: clamp(1rem, 2.5vw, 1.6rem); }
+
+  /* თითოეული კერძის ხაზი მენიუში */
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 2vw;
+    padding: 0.6vh 0;
+    border-bottom: 1px solid #2A2A2A;
+  }
+
+  .menu-item:last-child { border-bottom: none; }
+
+  /* კერძის პატარა სურათი (თამბნეილი) */
+  .item-thumb {
+    width: clamp(32px, 6vw, 55px);
+    height: clamp(32px, 6vw, 55px);
+    border-radius: 8px;
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(1rem, 3vw, 2rem);
+    flex-shrink: 0;
+    border: 1px solid #333;
+  }
+
+  .item-info { flex: 1; min-width: 0; }
+
+  /* კერძის სახელი მენიუში */
+  .item-name {
+    font-weight: 700;
+    font-size: clamp(0.65rem, 1.8vw, 1.1rem);
+    color: var(--white);
+    line-height: 1.2;
+  }
+
+  /* კერძის აღწერა მენიუში */
+  .item-desc {
+    font-size: clamp(0.45rem, 1.1vw, 0.7rem);
+    color: var(--grey);
+    font-weight: 300;
+    margin-top: 0.1vh;
+  }
+
+  /* კერძის ფასი მენიუში */
+  .item-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.6rem);
+    color: var(--amber);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ========== ქვედა ზოლი (ფუტერი) ========== */
+  .footer-bar {
+    background: var(--bg-hero);
+    padding: 1.2vh 3vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4vw;
+    border-top: 1px solid #2A2A2A;
+    flex-shrink: 0;
+  }
+
+  .footer-bar span {
+    font-size: clamp(0.55rem, 1.5vw, 0.9rem);
+    color: var(--grey);
+    letter-spacing: 0.03em;
+  }
+
+  .footer-bar .dot {
+    color: var(--amber);
+    font-size: 0.5em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== ჰერო ბარი — საცხობის სახელი და კარუსელი ========== -->
+<div class="hero">
+  <div class="hero-headline">
+    <div class="geo-title"><span>კიჩილი</span></div>          <!-- საცხობის სახელი -->
+    <div class="sub">თქვენი საყვარელი სამზარეულოთი</div>      <!-- ქვესათაური -->
+  </div>
+
+  <div class="carousel">
+    <div class="carousel-track">
+
+      <!-- ========== სლაიდი 1 ========== -->
+      <div class="carousel-slide active">
+        <div class="hero-card">
+          <div class="badge">ჰიტი</div>                       <!-- ბეჯი — წაშალე ხაზი თუ არ გინდა -->
+          <div class="hero-img">🥘<span class="photo-note">თქვენი ფოტო</span></div>  <!-- emoji ჩანაცვლდება ფოტოთი -->
+          <div class="hero-card-name">აჭარული ხაჭაპური</div>   <!-- კერძის სახელი -->
+          <div class="hero-card-desc">ნავის ფორმის, კვერცხით და კარაქით</div>  <!-- აღწერა -->
+          <div class="hero-card-price">12.00 ₾</div>           <!-- ფასი -->
+        </div>
+      </div>
+
+      <!-- ========== სლაიდი 2 ========== -->
+      <div class="carousel-slide">
+        <div class="hero-card">
+          <div class="hero-img">🫓<span class="photo-note">თქვენი ფოტო</span></div>
+          <div class="hero-card-name">კუბდარი</div>
+          <div class="hero-card-desc">სვანური სანელებლიანი ხორცის პური</div>
+          <div class="hero-card-price">14.00 ₾</div>
+        </div>
+      </div>
+
+      <!-- ========== სლაიდი 3 ========== -->
+      <div class="carousel-slide">
+        <div class="hero-card">
+          <div class="hero-img">🍯<span class="photo-note">თქვენი ფოტო</span></div>
+          <div class="hero-card-name">ჩურჩხელა</div>
+          <div class="hero-card-desc">ნიგოზით და ყურძნის ტატარით</div>
+          <div class="hero-card-price">5.00 ₾</div>
+        </div>
+      </div>
+
+      <!-- ========== სლაიდი 4 ========== -->
+      <div class="carousel-slide">
+        <div class="hero-card">
+          <div class="badge">ახალი</div>
+          <div class="hero-img">🫘<span class="photo-note">თქვენი ფოტო</span></div>
+          <div class="hero-card-name">ლობიანი</div>
+          <div class="hero-card-desc">ლობიოთი სავსე პური</div>
+          <div class="hero-card-price">7.00 ₾</div>
+        </div>
+      </div>
+
+      <!-- ახალი სლაიდის დასამატებლად დააკოპირე ზემოთ ერთი სლაიდი და ჩასვი აქ -->
+
+    </div>
+
+    <!-- კარუსელის წერტილები — რამდენი სლაიდიც გაქვს იმდენი dot უნდა იყოს -->
+    <div class="carousel-dots">
+      <div class="carousel-dot active"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+      <div class="carousel-dot"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== მენიუ — 3 სვეტი ========== -->
+<div class="menu-body">
+
+  <!-- ========== სვეტი 1: პურები ========== -->
+  <div class="menu-col">
+    <div class="col-title"><span class="ico">🍞</span> პურები</div>    <!-- კატეგორიის სათაური -->
+
+    <!-- კერძი — დააკოპირე ეს ბლოკი ახალი კერძის დასამატებლად -->
+    <div class="menu-item">
+      <div class="item-thumb">🫓</div>                   <!-- პატარა სურათი/emoji -->
+      <div class="item-info">
+        <div class="item-name">თონის პური</div>          <!-- კერძის სახელი -->
+        <div class="item-desc">თონეში გამომცხვარი ტრადიციული პური</div>  <!-- აღწერა -->
+      </div>
+      <div class="item-price">2.50 ₾</div>               <!-- ფასი -->
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🥖</div>
+      <div class="item-info">
+        <div class="item-name">შოთის პური</div>
+        <div class="item-desc">გრძელი, ნავის ფორმის თონის პური</div>
+      </div>
+      <div class="item-price">2.50 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🍞</div>
+      <div class="item-info">
+        <div class="item-name">ნაზუქი</div>
+        <div class="item-desc">ტკბილი სანელებლიანი პური</div>
+      </div>
+      <div class="item-price">4.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🫓</div>
+      <div class="item-info">
+        <div class="item-name">დედას პური</div>
+        <div class="item-desc">მრგვალი ტრადიციული პური</div>
+      </div>
+      <div class="item-price">2.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🫓</div>
+      <div class="item-info">
+        <div class="item-name">ლავაში</div>
+        <div class="item-desc">თხელი რბილი პური</div>
+      </div>
+      <div class="item-price">1.50 ₾</div>
+    </div>
+  </div>
+
+  <!-- ========== სვეტი 2: ხაჭაპური და ღვეზელები ========== -->
+  <div class="menu-col">
+    <div class="col-title"><span class="ico">🧀</span> ხაჭაპური და ღვეზელები</div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🥘</div>
+      <div class="item-info">
+        <div class="item-name">იმერული ხაჭაპური</div>
+        <div class="item-desc">მრგვალი, იმერული ყველით</div>
+      </div>
+      <div class="item-price">9.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🧀</div>
+      <div class="item-info">
+        <div class="item-name">მეგრული ხაჭაპური</div>
+        <div class="item-desc">ყველი შიგნითაც და ზემოდანაც</div>
+      </div>
+      <div class="item-price">10.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🫘</div>
+      <div class="item-info">
+        <div class="item-name">ლობიანი</div>
+        <div class="item-desc">ლობიოთი სავსე პური</div>
+      </div>
+      <div class="item-price">7.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🥧</div>
+      <div class="item-info">
+        <div class="item-name">აჩმა</div>
+        <div class="item-desc">ფენოვანი ყველიანი ნამცხვარი</div>
+      </div>
+      <div class="item-price">8.00 ₾</div>
+    </div>
+  </div>
+
+  <!-- ========== სვეტი 3: ტკბილეული და სასმელები ========== -->
+  <div class="menu-col">
+    <div class="col-title"><span class="ico">🍬</span> ტკბილეული და სასმელები</div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🍯</div>
+      <div class="item-info">
+        <div class="item-name">გოზინაყი</div>
+        <div class="item-desc">თაფლში მოხარშული ნიგოზი</div>
+      </div>
+      <div class="item-price">4.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🍮</div>
+      <div class="item-info">
+        <div class="item-name">ფელამუში</div>
+        <div class="item-desc">ყურძნის წვენის პუდინგი</div>
+      </div>
+      <div class="item-price">3.50 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🥮</div>
+      <div class="item-info">
+        <div class="item-name">კადა</div>
+        <div class="item-desc">ტკბილი კარაქიანი ფენოვანი ნამცხვარი</div>
+      </div>
+      <div class="item-price">3.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🥤</div>
+      <div class="item-info">
+        <div class="item-name">ლიმონათი</div>
+        <div class="item-desc">ტარხუნა, კრემ-სოდა, მსხალი</div>
+      </div>
+      <div class="item-price">3.00 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">☕</div>
+      <div class="item-info">
+        <div class="item-name">ყავა</div>
+      </div>
+      <div class="item-price">4.50 ₾</div>
+    </div>
+
+    <div class="menu-item">
+      <div class="item-thumb">🍵</div>
+      <div class="item-info">
+        <div class="item-name">ჩაი</div>
+      </div>
+      <div class="item-price">2.00 ₾</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========== ქვედა ზოლი ========== -->
+<div class="footer-bar">
+  <span>ყოველ დილით ახალი გამოცხობა</span>
+  <span class="dot">&#9679;</span>
+  <span>ფასები მითითებულია ლარებში (₾)</span>
+</div>
+
+<!-- ========== კარუსელის სკრიპტი ==========
+     5000 = 5 წამი (მილიწამებში). შეცვალე რიცხვი რომ სიჩქარე შეიცვალოს.
+     მაგ: 3000 = 3 წამი, 8000 = 8 წამი
+-->
+<script>
+  var slides = document.querySelectorAll('.carousel-slide');
+  var dots = document.querySelectorAll('.carousel-dot');
+  var current = 0;
+  var total = slides.length;
+
+  function goTo(index) {
+    slides[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = index % total;
+    slides[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  setInterval(function() {
+    goTo(current + 1);
+  }, 5000);    /* <-- აქ შეცვალე დრო (მილიწამებში) */
+</script>
+
+</body>
+</html>
